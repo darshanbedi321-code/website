@@ -5,8 +5,11 @@ class Database:
         try:
             self.conn = mysql.connector.connect(host="switchback.proxy.rlwy.net", user="root", password="RZNFaLvqKSXbmeDxTGtmkKZRHLBkCxak", database="railways",port =33397)
             self.mycursor = self.conn.cursor()
-        except:
-            pass
+        except Exception as e:
+            print(e)
+            self.conn = None 
+            self.mycursor = None
+            
         else:
             pass
 
