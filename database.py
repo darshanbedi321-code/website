@@ -3,7 +3,7 @@ import mysql.connector
 class Database:
     def __init__(self):
         try:
-            self.conn = mysql.connector.connect(host="switchback.proxy.rlwy.net", user="root", password="RZNFaLvqKSXbmeDxTGtmkKZRHLBkCxak", database="railways",port =33397)
+            self.conn = mysql.connector.connect(host="switchback.proxy.rlwy.net", user="root", password="RZNFaLvqKSXbmeDxTGtmkKZRHLBkCxak", database="railway",port =33397)
             self.mycursor = self.conn.cursor()
         except Exception as e:
             print(e)
@@ -21,6 +21,7 @@ class Database:
     """.format(name,age,email,password))
             self.conn.commit()
         except Exception as e:
-            return e
+            return str(e)
         else:
             return "done"
+        
