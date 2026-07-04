@@ -3,7 +3,7 @@ import mysql.connector
 class Database:
     def __init__(self):
         try:
-            self.conn = mysql.connector.connect(host="localhost", user="root", password="", database="user_info")
+            self.conn = mysql.connector.connect(host="switchback.proxy.rlwy.net", user="root", password="RZNFaLvqKSXbmeDxTGtmkKZRHLBkCxak", database="railways",port =33397)
             self.mycursor = self.conn.cursor()
         except:
             pass
