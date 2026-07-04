@@ -28,8 +28,11 @@ if st.button("verify"):
         with st.spinner("checking your email..."):
             try:
                 valid= validate_email(email,check_deliverability=False)
-                db.store(name,age,email,password)
-                st.write("welcome")
+                result= db.store(name,age,email,password)
+                if result ==1:
+                    st.write("welcome")
+                else:
+                    st.error("error")
             except EmailNotValidError as e:
                 st.error(f"invalid {e}")
                 st.info("retry after entering correct email")
