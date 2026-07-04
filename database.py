@@ -18,6 +18,6 @@ class Database:
     """.format(name,age,email,password))
             self.conn.commit()
         except Exception as e:
-            print("database error ",e)
+            return e
         else:
-            return 1
+            return "done"
