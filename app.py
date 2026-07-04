@@ -29,10 +29,7 @@ if st.button("verify"):
             try:
                 valid= validate_email(email,check_deliverability=False)
                 result= db.store(name,age,email,password)
-                if result ==1:
-                    st.write("welcome")
-                else:
-                    st.error("error")
+                st.write(result)
             except EmailNotValidError as e:
                 st.error(f"invalid {e}")
                 st.info("retry after entering correct email")
