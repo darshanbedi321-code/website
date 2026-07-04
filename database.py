@@ -14,7 +14,7 @@ class Database:
     def store(self,name,age,email,password=None):
         try:
             self.mycursor.execute("""
-            INSERT INTO `user data`(`name`, `age`, `email`, `password`) VALUES ('{}',{},"{}","{}")
+            INSERT INTO `user_data`(`name`, `age`, `email`, `password`) VALUES ('{}',{},"{}","{}")
     """.format(name,age,email,password))
             self.conn.commit()
         except Exception as e:
