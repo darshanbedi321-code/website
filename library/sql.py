@@ -1,15 +1,18 @@
 import mysql.connector
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 
 class Database:
     def __init__(self):
         try:
             self.conn = mysql.connector.connect(
-                host="hayabusa.proxy.rlwy.net",
-                user="root",
-                password="JnYnJDYBMWmaAYzOFQAVPOxMKbnhMYSD",
-                database="railway",
-                port=56787,
+                host=os.getenv("DB_HOST"),
+                user=os.getenv("DB_USER"),
+                password=os.getenv("DB_PASSWORD"),
+                database=os.getenv("DB_NAME"),
+                port=int(os.getenv("DB_PORT"))  
             )
             self.mycursor = self.conn.cursor()
         except Exception as e:
