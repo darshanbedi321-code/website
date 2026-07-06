@@ -20,7 +20,7 @@ name=st.text_input("enter your name")
 age= st.slider("enter any number",1,100)
 
 email= st.text_area("enter your email id")
-password= st.text_input("enter password")
+password= st.text_input("enter password",type = "password")
 if st.button("verify"):
     if not email:
         st.warning("first enter your email")
