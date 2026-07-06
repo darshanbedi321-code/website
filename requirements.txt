@@ -1,3 +1,0 @@
-streamlit
-mysql-connector-python>=8.0.33
-email-validator
