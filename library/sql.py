@@ -1,4 +1,4 @@
-import mysql.connector
+import psycopg2
 from dotenv import load_dotenv
 import os
 
@@ -6,67 +6,86 @@ load_dotenv()
 
 class Database:
     def __init__(self):
+        self.conn = None
+        self.mycursor = None
+        self.connection_error = None
         try:
-            self.conn = mysql.connector.connect(
+            self.conn = psycopg2.connect(
                 host=os.getenv("DB_HOST"),
                 user=os.getenv("DB_USER"),
                 password=os.getenv("DB_PASSWORD"),
-                database=os.getenv("DB_NAME"),
-                port=int(os.getenv("DB_PORT"))  
+                dbname=os.getenv("DB_NAME"),
+                port=int(os.getenv("DB_PORT")),
+                connect_timeout=10
             )
             self.mycursor = self.conn.cursor()
         except Exception as e:
             self.connection_error = str(e)
+            print("Connection Error:", e)
 
-    def store(self,name):
+    def store(self, name):
         if self.conn is None or self.mycursor is None:
-            return self.connection_error or "database connection failed"
-
+            print(self.connection_error or "database connection failed")
+            return -1
         try:
-            query = """
-                INSERT INTO books (bookname, statues)
-                VALUES (%s, %s)
-            """
+            query = "INSERT INTO darshan (bookname, status) VALUES (%s, %s)"
             self.mycursor.execute(query, (name, "available"))
             self.conn.commit()
-        except Exception:
-            return -1
-        else:
             return 1
-        
-    def books(self):
+        except Exception as e:
+            print("Insert Error:", e)
+            self.conn.rollback()
+            return -1
+
+    def all_books(self):
+        if self.conn is None or self.mycursor is None:
+            print(self.connection_error or "database connection failed")
+            return []
         try:
-            self.mycursor.execute("""SELECT * FROM books WHERE statues = 'available'""")
-            data=self.mycursor.fetchall()
-            return data
-        except:
-            print("error occur")
+            self.mycursor.execute("SELECT * FROM darshan ORDER BY bookname")
+            return self.mycursor.fetchall()
+        except Exception as e:
+            print("Fetch Error:", e)
+            return []
 
-    def issue(self, name, issuedby, fined, days):
-        data = self.books()
+    def books(self):
+        if self.conn is None or self.mycursor is None:
+            print(self.connection_error or "database connection failed")
+            return []
+        try:
+            self.mycursor.execute("SELECT * FROM darshan WHERE status = 'available'")
+            return self.mycursor.fetchall()
+        except Exception as e:
+            print("Fetch Error:", e)
+            return []
 
-        if any(name == row[1] for row in data):
-            try:
-                query = """
-                UPDATE books
-                SET statues = %s,
-                    issuedby = %s,
-                    fined = %s,
-                    days = %s
+    def issue(self, bookname, issuedby, fined, days):
+        if self.conn is None or self.mycursor is None:
+            print(self.connection_error or "database connection failed")
+            return 0
+
+        try:
+            self.mycursor.execute("SELECT status FROM darshan WHERE bookname = %s", (bookname,))
+            row = self.mycursor.fetchone()
+
+            if row is None:
+                print("Book is not present in library.")
+                return 0
+
+            if row[0] != "available":
+                print("Book is already issued.")
+                return 0
+
+            query = """
+                UPDATE darshan
+                SET status = %s, issuedby = %s, fined = %s, days = %s
                 WHERE bookname = %s
-                """
-
-                self.mycursor.execute(
-                    query,
-                    ("unavailable", issuedby, fined, days, name)
-                )
-
-                self.conn.commit()
-                print("Book is issued.")
-
-            except Exception as e:
-                print("Error:", e)
-
-        else:
-            print("Book is not present in library.")
-                
+            """
+            self.mycursor.execute(query, ("unavailable", issuedby, fined, days, bookname))
+            self.conn.commit()
+            print("Book is issued.")
+            return 1
+        except Exception as e:
+            print("Update Error:", e)
+            self.conn.rollback()
+            return -1
